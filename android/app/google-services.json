@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "356734869782",
+    "project_id": "reactass-7118f",
+    "storage_bucket": "reactass-7118f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:356734869782:android:1eb93f990144765a9e3037",
+        "android_client_info": {
+          "package_name": "com.nativeproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "356734869782-jfp5fo7d2o0ocaudkfebd27ccobm95kp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOOJCbCatSjQ8l1_i-iThtD8xx0Mlh1cY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "356734869782-jfp5fo7d2o0ocaudkfebd27ccobm95kp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
