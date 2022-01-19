@@ -26,7 +26,7 @@ class HomeScreen extends PureComponent {
       disableSelfie: false,
     };
 
-    this.onBarCodeRead = this.onBarCodeRead.bind(this);
+    // this.onBarCodeRead = this.onBarCodeRead.bind(this);
   }
 
   componentWillUnmount() {
@@ -80,10 +80,16 @@ class HomeScreen extends PureComponent {
     }
   };
 
-  updateCardData = data => {
-    this.setState({mAadhaarData: data, loading: true});
+  updateCardData = xml => {
+    this.setState({loading: true});
 
     try {
+      var data;
+      parseString(xml, function (err, result) {
+        data = result.PrintLetterBarcodeData.$;
+      });
+
+      /**Upload data to firebase */
       database()
         .ref('AadharCard/')
         .set({
@@ -91,9 +97,7 @@ class HomeScreen extends PureComponent {
         })
         .then(data => {
           //success callback
-          console.log('data ', data);
 
-          //   Alert.alert('Success', 'Aadhar Details Uploaded Successfully');
           ToastAndroid.show(
             'Aadhar Details Uploaded Successfully',
             ToastAndroid.SHORT,
@@ -111,37 +115,67 @@ class HomeScreen extends PureComponent {
           console.log('error ', error);
         });
     } catch (error) {
-      console.log(error);
+      console.log('error', error);
+
+      alert(error);
     }
   };
 
-  onBarCodeRead = event => {
-    if (this.state.isBarcodeRead) {
-      // code //
+  // onBarCodeRead = event => {
+  //   if (this.state.isBarcodeRead) {
+  //     // code //
 
-      console.log('print data', event.data);
-      //   alert(event.data);
+  //     console.log('print data', event.data);
+  //     //   alert(event.data);
+  //     this.setState({
+  //       isBarcodeRead: false,
+  //     });
+
+  //     var xml = event.data;
+  //     var data;
+  //     parseString(xml, function (err, result) {
+  //       console.dir(result.PrintLetterBarcodeData.$);
+  //       data = result.PrintLetterBarcodeData.$;
+  //     });
+  //     this.updateCardData(data);
+  //   }
+  //   // if (this.state.alertPresent) {
+  //   //   this.setState({showAlert: false});
+  //   //   Alert.alert(
+  //   //     'Barcode type is ' + e.type,
+  //   //     'Barcode value is ' + e.data,
+  //   //     [{text: 'OK', onPress: () => console.log('ok')}],
+  //   //     {cancelable: false},
+  //   //   );
+  //   // }
+  // };
+
+  barcodeRecognized = ({barcodes}) => {
+    // barcodes.forEach(barcode => console.warn(barcode.data));
+    if (
+      this.state.isSelfieUploaded &&
+      barcodes.length > 0 &&
+      this.state.isBarcodeRead
+    ) {
       this.setState({
         isBarcodeRead: false,
       });
+      var xml = barcodes[0].data;
+      Alert.alert('Success', JSON.stringify(xml), [
+        {
+          text: 'Cancel',
+          onPress: () => {
+            this.setState({
+              isBarcodeRead: true,
+            });
 
-      var xml = event.data;
-      var data;
-      parseString(xml, function (err, result) {
-        console.dir(result.PrintLetterBarcodeData.$);
-        data = result.PrintLetterBarcodeData.$;
-      });
-      this.updateCardData(data);
+            console.log('Cancel Pressed');
+          },
+          style: 'cancel',
+        },
+        {text: 'Upload', onPress: () => this.updateCardData(xml)},
+      ]);
     }
-    // if (this.state.alertPresent) {
-    //   this.setState({showAlert: false});
-    //   Alert.alert(
-    //     'Barcode type is ' + e.type,
-    //     'Barcode value is ' + e.data,
-    //     [{text: 'OK', onPress: () => console.log('ok')}],
-    //     {cancelable: false},
-    //   );
-    // }
   };
 
   showCamera = () => {
@@ -170,7 +204,12 @@ class HomeScreen extends PureComponent {
             buttonPositive: 'Ok',
             buttonNegative: 'Cancel',
           }}
-          onBarCodeRead={this.onBarCodeRead.bind(this)}
+          onGoogleVisionBarcodesDetected={this.barcodeRecognized}
+          googleVisionBarcodeType={
+            RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeType.QR_CODE
+          }
+
+          // onBarCodeRead={this.onBarCodeRead.bind(this)}
           //   onGoogleVisionBarcodesDetected={({barcodes}) => {
           //     if (barcodes.length > 0) {
           //       var xml = barcodes[0].data;
